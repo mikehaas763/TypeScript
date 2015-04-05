@@ -74,12 +74,24 @@ class ProjectRunner extends RunnerBase {
         }
         var testCaseJustName = testCaseFileName.replace(/^.*[\\\/]/, '').replace(/\.json/, "");
 
-        function moduleNameToString(moduleKind: ts.ModuleKind) {
-            return moduleKind === ts.ModuleKind.AMD
-                ? "amd"
-                : moduleKind === ts.ModuleKind.CommonJS
-                ? "node"
-                : "none";
+        function moduleNameToString(moduleKind: ts.ModuleKind) : string {
+            let moduleName: string;
+
+            switch (moduleKind) {
+                case ts.ModuleKind.SystemJS:
+                    moduleName = "systemjs";
+                    break;
+                case ts.ModuleKind.AMD:
+                    moduleName = "amd";
+                    break;
+                case ts.ModuleKind.CommonJS:
+                    moduleName = "node";
+                    break;
+                default:
+                    moduleName = "none";
+            }
+
+            return moduleName;
         }
 
         // Project baselines verified go in project/testCaseName/moduleKind/

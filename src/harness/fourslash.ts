@@ -155,6 +155,9 @@ module FourSlash {
                     case metadataOptionNames.module:
                         // create appropriate external module target for CompilationSettings
                         switch (globalOptions[prop]) {
+                            case "SystemJS":
+                                settings.module = ts.ModuleKind.SystemJS;
+                                break;
                             case "AMD":
                                 settings.module = ts.ModuleKind.AMD;
                                 break;

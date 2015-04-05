@@ -951,7 +951,9 @@ module Harness {
                         case "module":
                         case "modulegentarget":
                             if (typeof setting.value === 'string') {
-                                if (setting.value.toLowerCase() === 'amd') {
+                                if (setting.value.toLowerCase() === 'systemjs') {
+                                    options.module = ts.ModuleKind.SystemJS;
+                                } else if (setting.value.toLowerCase() === 'amd') {
                                     options.module = ts.ModuleKind.AMD;
                                 } else if (setting.value.toLowerCase() === 'commonjs') {
                                     options.module = ts.ModuleKind.CommonJS;

@@ -50,7 +50,8 @@ module ts {
             shortName: "m",
             type: {
                 "commonjs": ModuleKind.CommonJS,
-                "amd": ModuleKind.AMD
+                "amd": ModuleKind.AMD,
+                "systemjs": ModuleKind.SystemJS
             },
             description: Diagnostics.Specify_module_code_generation_Colon_commonjs_or_amd,
             paramType: Diagnostics.KIND,

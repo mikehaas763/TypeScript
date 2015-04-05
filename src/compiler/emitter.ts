@@ -4493,6 +4493,59 @@ module ts {
                 }
             }
 
+            function emitSystemJSModule(node: SourceFile, startIndex: number) {
+                collectExternalModuleInfo(node);
+                writeLine();
+                write("System.register(");
+                sortAMDModules(node.amdDependencies);
+                if (node.amdModuleName) {
+                    write("\"" + node.amdModuleName + "\", ");
+                }
+                write("[\"exports\"");
+                for (let importNode of externalImports) {
+                    write(", ");
+                    let moduleName = getExternalModuleName(importNode);
+                    if (moduleName.kind === SyntaxKind.StringLiteral) {
+                        emitLiteral(<LiteralExpression>moduleName);
+                    }
+                    else {
+                        write("\"\"");
+                    }
+                }
+                for (let amdDependency of node.amdDependencies) {
+                    let text = "\"" + amdDependency.path + "\"";
+                    write(", ");
+                    write(text);
+                }
+                write("], function (exports");
+                for (let importNode of externalImports) {
+                    write(", ");
+                    let namespaceDeclaration = getNamespaceDeclarationNode(importNode);
+                    if (namespaceDeclaration && !isDefaultImport(importNode)) {
+                        emit(namespaceDeclaration.name);
+                    }
+                    else {
+                        write(getGeneratedNameForNode(<ImportDeclaration | ExportDeclaration>importNode));
+                    }
+                }
+                for (let amdDependency of node.amdDependencies) {
+                    if (amdDependency.name) {
+                        write(", ");
+                        write(amdDependency.name);
+                    }
+                }
+                write(") {");
+                increaseIndent();
+                emitExportStarHelper();
+                emitCaptureThisForNodeIfNecessary(node);
+                emitLinesStartingAt(node.statements, startIndex);
+                emitTempDeclarations(/*newLine*/ true);
+                emitExportEquals(/*emitAsReturn*/ true);
+                decreaseIndent();
+                writeLine();
+                write("});");
+            }
+
             function emitAMDModule(node: SourceFile, startIndex: number) {
                 collectExternalModuleInfo(node);
                 writeLine();
@@ -4651,6 +4704,9 @@ var __decorate = this.__decorate || function (decorators, target, key, value) {
                 if (isExternalModule(node)) {
                     if (languageVersion >= ScriptTarget.ES6) {
                         emitES6Module(node, startIndex);
+                    }
+                    else if (compilerOptions.module === ModuleKind.SystemJS) {
+                        emitSystemJSModule(node, startIndex);
                     }
                     else if (compilerOptions.module === ModuleKind.AMD) {
                         emitAMDModule(node, startIndex);
